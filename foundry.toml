@@ -1,0 +1,45 @@
+[profile.default]
+src = "src"
+out = "out"
+libs = ["lib"]
+test = "test"
+cache = true
+evm_version = "paris"
+solc = "0.8.20"
+optimizer = true
+optimizer_runs = 10_000
+via_ir = false
+
+[profile.optimized]
+src = "src"
+out = "out"
+libs = ["lib"]
+test = "test"
+cache = true
+evm_version = "paris"
+solc = "0.8.20"
+optimizer = true
+optimizer_runs = 1_000_000
+via_ir = true
+
+[profile.ci]
+src = "src"
+out = "out"
+libs = ["lib"]
+test = "test"
+cache = true
+evm_version = "paris"
+solc = "0.8.20"
+optimizer = true
+optimizer_runs = 10_000
+via_ir = false
+verbosity = 3
+
+[rpc_endpoints]
+mainnet = "${RPC_MAINNET}"
+sepolia = "${RPC_SEPOLIA}"
+localhost = "http://127.0.0.1:8545"
+
+[etherscan]
+mainnet = { key = "${ETHERSCAN_API_KEY}" }
+sepolia = { key = "${ETHERSCAN_API_KEY}" }

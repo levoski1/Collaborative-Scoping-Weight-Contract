@@ -1,0 +1,35 @@
+# ─── Foundry ───────────────────────────────
+out/
+cache/
+broadcast/
+.env
+.env.local
+.env.*.local
+
+# ─── Node / JS (Hardhat leftovers) ────────
+node_modules/
+coverage/
+coverage.json
+artifacts/
+cache_hardhat/
+typechain-types/
+
+# ─── IDE ───────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ─── OS ────────────────────────────────────
+.DS_Store
+Thumbs.db
+*.log
+
+# ─── Docs build ────────────────────────────
+docs/build/
+site/
+
+# ─── Docker ────────────────────────────────
+.docker/
+docker-compose.override.yml

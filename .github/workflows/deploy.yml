@@ -1,0 +1,59 @@
+name: Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      network:
+        description: "Target network"
+        required: true
+        default: "sepolia"
+        type: choice
+        options:
+          - sepolia
+          - mainnet
+      verify:
+        description: "Verify contract on Etherscan"
+        required: true
+        default: true
+        type: boolean
+
+env:
+  FOUNDRY_PROFILE: optimized
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: nightly
+
+      - name: Install dependencies
+        run: forge install
+
+      - name: Build
+        run: forge build --force
+        env:
+          FOUNDRY_PROFILE: optimized
+
+      - name: Deploy to ${{ github.event.inputs.network }}
+        run: >
+          forge script script/Deploy.s.sol:DeployScript
+          --rpc-url ${{ github.event.inputs.network }}
+          --private-key ${{ secrets.PRIVATE_KEY }}
+          --broadcast
+          --verify ${{ github.event.inputs.verify }}
+          --etherscan-api-key ${{ secrets.ETHERSCAN_API_KEY }}
+          -vvvv
+
+      - name: Save deployment artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: broadcast-logs
+          path: broadcast/
+          retention-days: 30
