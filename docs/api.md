@@ -1,83 +1,83 @@
 # API Reference
 
-## WaveScoping (Hub Contract)
+## WaveScoping (Hub)
 
 ### State-Changing Functions
 
-#### `constructor(uint256 _votingPeriodBlocks, uint256 _emergencyTimelock, uint256 _maxWeightPerVote, uint256 _pointsDivisor, uint256 _decayRateBps, uint256 _slashMaxBps, uint256 _slashBurnRateBps)`
-Deploys the hub contract and all three module contracts atomically.
+#### `WaveScoping::new(owner, voting_period_blocks, emergency_timelock, max_weight_per_vote, points_divisor, decay_rate_bps, slash_max_bps, slash_burn_rate_bps)`
+Creates a new WaveScoping instance with all three module managers.
 
-#### `setOwner(address _newOwner)`
+#### `set_owner(caller, new_owner)`
 Transfers ownership. OnlyOwner.
 
-#### `createWave(string calldata _name, uint256 _durationBlocks)` → `uint256`
-Creates a new wave. Returns the wave ID (keccak256 hash of name+block). OnlyOwner.
+#### `create_wave(caller, name, duration_blocks)` → `u64`
+Creates a new wave. Returns the wave ID (hash of name+block). OnlyOwner.
 
-#### `registerIssue(string calldata _url)`
+#### `register_issue(caller, url)`
 Registers an issue for the current wave. Reverts if already registered. OnlyOwner.
 
-#### `voteOnIssue(string calldata _url, uint256 _weight)`
+#### `vote_on_issue(caller, url, weight)`
 Casts a weighted vote. Each address gets one vote per issue. Weight is boosted by voter's reputation balance. Multi-call reverts.
 
-#### `fastTrackIssue(string calldata _url, string calldata _reason)`
-Proposes and immediately executes an emergency fast-track, doubling the max weight on the issue. OnlyOwner.
+#### `fast_track_issue(caller, url, reason)`
+Proposes and executes an emergency fast-track, doubling the max weight on the issue. OnlyOwner.
 
-#### `startWork(string calldata _url)`
+#### `start_work(caller, url)`
 Marks an issue as having work started by the caller. Prevents later point changes without slashing.
 
-#### `finalizeWave(uint256 _waveId)`
+#### `finalize_wave(caller, wave_id)`
 Locks a wave, preventing further voting. OnlyOwner.
 
-#### `adjustPoints(string calldata _url, uint256 _newPoints, string calldata _reason)`
+#### `adjust_points(caller, url, new_points, reason)`
 Adjusts issue points. If work has started beyond the grace window, the caller is slashed. OnlyOwner.
 
 ### View Functions
 
 | Function | Returns | Description |
 |----------|---------|-------------|
-| `getIssue(string)` | `(weight, points, isEmergency, contributor)` | Full issue state |
-| `getWave(uint256)` | `WaveData` | Full wave state |
-| `getCurrentWave()` | `WaveData` | Active wave |
-| `getWaveConfig()` | `WaveConfig` | Contract parameters |
-| `getVoterWeight(address, string)` | `uint256` | Vote weight cast by user |
+| `get_issue(url)` | `(weight, points, is_emergency, contributor)` | Full issue state |
+| `get_wave(wave_id)` | `WaveData` | Full wave state |
+| `get_current_wave()` | `WaveData` | Active wave |
+| `get_wave_config()` | `WaveConfig` | Contract parameters |
+| `get_voter_weight(voter, url)` | `u64` | Vote weight cast by user |
 
 ## ReputationManager
 
 | Function | Description |
 |----------|-------------|
-| `balanceOf(address)` | Returns reputation balance |
-| `mintReputation(address, uint256)` | Only WaveScoping |
-| `burnReputation(address, uint256)` | Only WaveScoping. Reverts if insufficient |
-| `consumeReputation(address, uint256)` | Only WaveScoping. Returns bool |
-| `decayAll()` | Advances epoch, decaying all balances |
+| `balance_of(user)` | Returns reputation balance |
+| `mint_reputation(user, amount)` | Called by hub |
+| `burn_reputation(user, amount)` | Called by hub. Reverts if insufficient |
+| `consume_reputation(user, amount)` | Called by hub. Returns bool |
+| `decay_all()` | Advances epoch, decaying all balances |
 
 ## EmergencyScoping
 
 | Function | Description |
 |----------|-------------|
-| `proposeFastTrack(string, string, address)` | Creates a proposal. OnlyOwner |
-| `executeFastTrack(string, address)` | Executes after timelock. OnlyOwner |
-| `getProposal(string)` | Returns proposal details |
-| `isFastTracked(string)` | Returns whether executed |
+| `propose_fast_track(url, reason, owner, caller, block_number)` | Creates a proposal. OnlyOwner |
+| `execute_fast_track(url, owner, caller, block_number)` | Executes after timelock. OnlyOwner |
+| `get_proposal(url)` | Returns proposal details |
+| `is_fast_tracked(url)` | Returns whether executed |
 
 ## SlashingManager
 
 | Function | Description |
 |----------|-------------|
-| `slash(address,string,uint256,uint256,string)` | Records a slash. Only WaveScoping |
-| `getSlashRecord(address,string)` | Returns slash record |
-| `totalSlashed(address)` | Aggregated penalty for maintainer |
+| `slash(maintainer, url, prev_points, new_points, reason)` | Records a slash. Called by hub |
+| `get_slash_record(maintainer, url)` | Returns slash record |
+| `total_slashed(maintainer)` | Aggregated penalty for maintainer |
 
 ## Events
 
 | Event | Parameters |
 |-------|------------|
-| `IssueRegistered` | `url`, `waveId` |
+| `IssueRegistered` | `url`, `wave_id` |
 | `Voted` | `voter`, `url`, `weight` |
 | `IssueFastTracked` | `url`, `maintainer` |
 | `ContributionStarted` | `url`, `contributor` |
 | `ReputationEarned` | `voter`, `amount` |
 | `SlashApplied` | `maintainer`, `penalty` |
-| `WaveCreated` | `id`, `name`, `endBlock` |
+| `WaveCreated` | `id`, `name`, `end_block` |
 | `WaveFinalized` | `id` |
-| `PointsAdjusted` | `url`, `oldPoints`, `newPoints` |
+| `PointsAdjusted` | `url`, `old_points`, `new_points` |

@@ -1,35 +1,20 @@
-# ─── Foundry ───────────────────────────────
-out/
-cache/
-broadcast/
-.env
-.env.local
-.env.*.local
+# ─── Rust ────────────────────────────────────
+target/
+Cargo.lock
 
-# ─── Node / JS (Hardhat leftovers) ────────
-node_modules/
-coverage/
-coverage.json
-artifacts/
-cache_hardhat/
-typechain-types/
-
-# ─── IDE ───────────────────────────────────
+# ─── IDE ─────────────────────────────────────
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
 
-# ─── OS ────────────────────────────────────
+# ─── OS ──────────────────────────────────────
 .DS_Store
 Thumbs.db
 *.log
 
-# ─── Docs build ────────────────────────────
-docs/build/
-site/
-
-# ─── Docker ────────────────────────────────
-.docker/
-docker-compose.override.yml
+# ─── Environment ─────────────────────────────
+.env
+.env.local
+.env.*.local

@@ -6,90 +6,31 @@ on:
   pull_request:
     branches: [main]
 
-env:
-  FOUNDRY_PROFILE: ci
-
 jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          submodules: recursive
 
-      - name: Install Foundry
-        uses: foundry-rs/foundry-toolchain@v1
+      - name: Install Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
-          version: nightly
+          components: clippy, rustfmt
 
       - name: Check formatting
-        run: forge fmt --check
+        run: cargo fmt --check
+
+      - name: Clippy
+        run: cargo clippy -- -D warnings
 
   test:
     needs: lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          submodules: recursive
 
-      - name: Install Foundry
-        uses: foundry-rs/foundry-toolchain@v1
-        with:
-          version: nightly
-
-      - name: Install dependencies
-        run: forge install
+      - name: Install Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
 
       - name: Run tests
-        run: forge test -vvv
-
-      - name: Run gas report
-        run: forge snapshot
-
-  coverage:
-    needs: lint
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: recursive
-
-      - name: Install Foundry
-        uses: foundry-rs/foundry-toolchain@v1
-        with:
-          version: nightly
-
-      - name: Install dependencies
-        run: forge install
-
-      - name: Generate coverage
-        run: forge coverage --report lcov
-
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v4
-        with:
-          files: lcov.info
-          fail_ci_if_error: true
-
-  slither:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: recursive
-
-      - name: Install Foundry
-        uses: foundry-rs/foundry-toolchain@v1
-        with:
-          version: nightly
-
-      - name: Install dependencies
-        run: forge install && forge build --force
-
-      - name: Run Slither
-        uses: crytic/slither-action@v0.4.0
-        continue-on-error: true
-        with:
-          target: src/
-          solc-version: 0.8.20
+        run: cargo test

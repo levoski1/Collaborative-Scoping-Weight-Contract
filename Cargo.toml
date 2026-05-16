@@ -1,0 +1,9 @@
+[package]
+name = "wave-scoping"
+version = "0.1.0"
+edition = "2021"
+description = "Decentralized backlog prioritization via weighted voting"
+
+[dependencies]
+
+[dev-dependencies]

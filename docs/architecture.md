@@ -2,7 +2,7 @@
 
 ## Overview
 
-The WaveScoping system follows a **hub-and-spoke** modular architecture. The core `WaveScoping` contract acts as the orchestrator (hub), delegating specialized concerns to satellite modules (spokes): `ReputationManager`, `EmergencyScoping`, and `SlashingManager`.
+The WaveScoping system follows a **hub-and-spoke** modular architecture. The core `WaveScoping` struct acts as the orchestrator (hub), delegating specialized concerns to satellite modules (spokes): `ReputationManager`, `EmergencyScoping`, and `SlashingManager`.
 
 ## Architecture Diagram
 
@@ -14,7 +14,7 @@ The WaveScoping system follows a **hub-and-spoke** modular architecture. The cor
 |  | Manager       │  │                  │  │ Manager       │   │
 │  └──────────────┘  └──────────────────┘  └───────────────┘   │
 │  ┌──────────────┐  ┌──────────────────┐                       │
-│  │ MathLib      │  │ WaveLib          │                       │
+│  │ math (mod)   │  │ wave (mod)       │                       │
 │  └──────────────┘  └──────────────────┘                       │
 └──────────────────────────────────────────────────────────────┘
 ```
@@ -25,15 +25,15 @@ The WaveScoping system follows a **hub-and-spoke** modular architecture. The cor
 - **ReputationManager** — Tracks reputation balances, handles decay, enforces reputation-based weight boosting.
 - **EmergencyScoping** — Manages fast-track proposals with timelock enforcement.
 - **SlashingManager** — Handles penalty calculation, slash recording, and burn logic.
-- **MathLib** — Pure math utilities (basis points, decay, weighted scores).
-- **WaveLib** — Structs and pure functions for wave lifecycle validation.
+- **math** — Pure math utilities (basis points, decay, weighted scores).
+- **wave** — Structs and pure functions for wave lifecycle validation.
 
 ## Design Decisions
 
-### Why separate modules instead of inheritance?
-- **Composability** — Modules can be upgraded/replaced independently.
-- **Testability** — Each module can be tested in isolation.
-- **Bytecode size** — Avoids the 24KB contract size limit by splitting logic.
+### Why separate modules instead of monolithic code?
+- **Composability** — Modules can be tested independently.
+- **Testability** — Each module has its own test suite.
+- **Maintainability** — Clear separation of concerns.
 
 ### Why timelocks for emergency scoping?
 - Prevents single-maintainer abuse.
